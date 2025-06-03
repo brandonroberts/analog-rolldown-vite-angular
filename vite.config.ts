@@ -6,6 +6,7 @@ import analog from '@analogjs/platform';
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   build: {
+    outDir: 'dist/client',
     target: ['es2020'],
   },
   resolve: {
@@ -13,6 +14,17 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     analog(),
+    mode === 'test' && {
+      name: 'vitest-rolldown',
+      load(source) {
+        // workaround for Vitest
+        if (source === '/@vite/env') {
+          return '';
+        }
+
+        return undefined;
+      }
+    }    
   ],
   test: {
     globals: true,
@@ -24,4 +36,7 @@ export default defineConfig(({ mode }) => ({
   define: {
     'import.meta.vitest': mode !== 'production',
   },
+  experimental: {
+    enableNativePlugin: true
+  }
 }));
